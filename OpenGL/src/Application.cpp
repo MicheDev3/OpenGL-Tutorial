@@ -6,6 +6,7 @@
 
 #include "Common.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "Renderer.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
@@ -36,10 +37,12 @@ int main(void)
 	// Make the window's context current 
 	glfwMakeContextCurrent(window);
 
-	// the default for I guess the NVidia implementation
+	// the default for, I guess, the NVidia implementation
 	// is 1, I do not have the staggering animation 
 	// just for clarity I will put it anyway 
-	glfwSwapInterval(1);                                                                          // this will synchronize with the vsync in order to get the transaction smoothly  (it seems I do not need it)
+	// this will synchronize with the vsync in order to
+	// get the transaction smoothly 
+	glfwSwapInterval(1); 
 
 	// glewInit must be called right after 
 	// a context has be made
@@ -60,11 +63,13 @@ int main(void)
 		// since some vertex are in common between the triangles
 		// I do not really need to store them twice so I use an
 		// index buffer
+		// Now I am adding to more floats, which they are the 
+		// texture coordinates (u,v)
 		float positions[] = {
-			-0.5f, -0.5f, // 0
-			 0.5f, -0.5f, // 1
-			 0.5f,  0.5f, // 2
-			-0.5f,  0.5f  // 3
+			-0.5f, -0.5f, 0.0f, 0.0f, // 0
+			 0.5f, -0.5f, 1.0f, 0.0f, // 1
+			 0.5f,  0.5f, 1.0f, 1.0f, // 2
+			-0.5f,  0.5f, 0.0f, 1.0f  // 3
 		};
 
 		// it has to be unsigned
@@ -73,11 +78,17 @@ int main(void)
 			2, 3, 0
 		};
 
+		// this is for blending texture but will be
+		// put in an other part for now here
+		GLCALL(glEnable(GL_BLEND));
+		GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 		VertexArray va;
-		VertexBuffer vb{ positions, 4 * 2 * sizeof(float) };
+		VertexBuffer vb{ positions, 4 * 4 * sizeof(float) };
 
 		VertexBufferLayout layout;
-		layout.Push<float>(2);
+		layout.Push<float>(2);       // x, z 
+		layout.Push<float>(2);       // u, v
 
 		va.AddBuffer(vb, layout);
 
@@ -85,6 +96,13 @@ int main(void)
 
 		Shader shader{ "res/shaders/Basic.shader" };
 		shader.Bind();
+
+		Texture texture{ "res/textures/b-logo.png" };
+		texture.Bind();
+		// binding into the shader the texture slot to
+		// be used. It must correspond to what pass in
+		// to texture.Bind() default is 0
+		shader.setUniform1i("u_Texture", 0);
 
 		Renderer renderer;
 
@@ -100,7 +118,7 @@ int main(void)
 			// uniform are per draw, for now I need to do this for
 			// settings uniform. One way to solve this would be using
 			// materials
-			shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+			//shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
 
 			renderer.Draw(va, ib, shader);
 		
