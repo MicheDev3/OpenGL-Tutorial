@@ -34,7 +34,7 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a windowed mode window and its OpenGL context 
-	window = glfwCreateWindow(640, 480, "OpenGL Tutorial", NULL, NULL);
+	window = glfwCreateWindow(960, 540, "OpenGL Tutorial", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -73,10 +73,10 @@ int main(void)
 		// Now I am adding to more floats, which they are the 
 		// texture coordinates (u,v)
 		float positions[] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, // 0
-			 0.5f, -0.5f, 1.0f, 0.0f, // 1
-			 0.5f,  0.5f, 1.0f, 1.0f, // 2
-			-0.5f,  0.5f, 0.0f, 1.0f  // 3
+			-50.0f, -50.0f, 0.0f, 0.0f, // 0
+			 50.0f, -50.0f, 1.0f, 0.0f, // 1
+			 50.0f,  50.0f, 1.0f, 1.0f, // 2
+			-50.0f,  50.0f, 0.0f, 1.0f  // 3
 		};
 
 		// it has to be unsigned
@@ -102,8 +102,8 @@ int main(void)
 		IndexBuffer ib{ indices, 6 };
 
 		// 4 by 3 aspect ratio projection matrix
-		glm::mat4 projection = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
-		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+		glm::mat4 projection = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
  
 		Shader shader{ "res/shaders/Basic.shader" };
 		shader.Bind();
@@ -123,10 +123,8 @@ int main(void)
 
 		ImGui::StyleColorsDark();
 
-		float r = 0.0f;
-		float increment = 0.05f;
-
-		glm::vec3 translation { 0.5f, 0.5f, 0.0f };
+		glm::vec3 translationA { 200.0f, 200.0f, 0.0f };
+		glm::vec3 translationB { 400.0f, 200.0f, 0.0f };
 
 		// Loop until the user closes the window
 		while (!glfwWindowShouldClose(window))
@@ -139,35 +137,39 @@ int main(void)
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
-			// since in OpenGL matrix are ordered by column
-			// I need to multiply the matrix in reverse 
-			glm::mat4 mvp = projection * view * model;
-
-			// uniform are per draw, for now I need to do this for
-			// settings uniform. One way to solve this would be using
-			// materials
-			shader.SetUniformMat4f("u_MVP", mvp);
-
-			renderer.Draw(va, ib, shader);
-		
-			if (r >= 1.0f)
 			{
-				increment = -0.05f;
-			}
-			else if (r < 0.0f)
-			{
-				increment = 0.05f;
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationA);
+				// since in OpenGL matrix are ordered by column
+				// I need to multiply the matrix in reverse 
+				glm::mat4 mvp = projection * view * model;
+				// uniform are per draw, for now I need to do this for
+				// settings uniform. One way to solve this would be using
+				// materials
+				shader.SetUniformMat4f("u_MVP", mvp);
+				
+				renderer.Draw(va, ib, shader);
 			}
 
-			r += increment;
-
 			{
-				static float f = 0.0f;
-				ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			}
+				glm::mat4 model = glm::translate(glm::mat4(1.0f), translationB);
+				// since in OpenGL matrix are ordered by column
+				// I need to multiply the matrix in reverse 
+				glm::mat4 mvp = projection * view * model;
+				// uniform are per draw, for now I need to do this for
+				// settings uniform. One way to solve this would be using
+				// materials
+				shader.SetUniformMat4f("u_MVP", mvp);
 
+				renderer.Draw(va, ib, shader);
+			}
+			
+			{
+				ImGui::SliderFloat3("Translation A", &translationA.x, 0.0f, 940.0f);
+				ImGui::SliderFloat3("Translation B", &translationB.x, 0.0f, 940.0f);
+
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f /
+					ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
