@@ -41,3 +41,6 @@ CodeGraphData/
 *.user
 *.userosscache
 *.sln.docstates
+
+# ImGui
+imgui.ini
