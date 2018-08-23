@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Common.h"
-
-#include "Shader.h"
-#include "VertexArray.h"
-#include "IndexBuffer.h"
+// forward declaration
+class Shader;
+class VertexArray;
+class IndexBuffer;
 
 
 class Renderer

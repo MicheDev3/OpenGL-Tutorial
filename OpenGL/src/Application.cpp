@@ -3,7 +3,6 @@
 #include <string>
 #include <sstream>
 
-
 #include "Common.h"
 #include "Shader.h"
 #include "Texture.h"
@@ -11,6 +10,9 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
+
+#include <GLFW/glfw3.h>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Common.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
+// forward declaration
+class VertexBuffer;
+class VertexBufferLayout;
 
 
 class VertexArray

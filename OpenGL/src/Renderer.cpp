@@ -1,5 +1,9 @@
 #include "Renderer.h"
 
+#include "Common.h"
+#include "Shader.h"
+#include "VertexArray.h"
+#include "IndexBuffer.h"
 
 
 Renderer::Renderer()

@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include <GL/glew.h>     // since glfw include glew must be put first
-#include <GLFW/glfw3.h>  // does it make sense to include it just one time? I think it does
 
 
 // MSVC compiler dependent

@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "Common.h"
 
 class Texture
 {
