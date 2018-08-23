@@ -32,7 +32,7 @@ void Shader::UnBind() const
 	GLCALL(glUseProgram(0));
 }
 
-void Shader::setUniform1i(const std::string& name, int value)
+void Shader::SetUniform1i(const std::string& name, int value)
 {
 	GLCALL(glUniform1i(GetUniformLocation(name), value));
 }
@@ -41,6 +41,14 @@ void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2,
 {
 
 	GLCALL(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
+}
+
+void Shader::SetUniformMat4f(const std::string& name, const glm::mat4& matrix)
+{
+	// the third parameter is true if we want to transpose the matrix
+	// OpenGL aspects matrix to be order by column not by raw since
+	// I am using glm it is already ordered by column
+	GLCALL(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]));
 }
 
 int Shader::GetUniformLocation(const std::string& name)

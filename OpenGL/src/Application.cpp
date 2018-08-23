@@ -12,6 +12,13 @@
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 
 int main(void)
 {
@@ -94,6 +101,10 @@ int main(void)
 
 		IndexBuffer ib{ indices, 6 };
 
+		// 4 by 3 aspect ratio projection matrix
+		glm::mat4 projection = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);
+		glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+ 
 		Shader shader{ "res/shaders/Basic.shader" };
 		shader.Bind();
 
@@ -102,12 +113,20 @@ int main(void)
 		// binding into the shader the texture slot to
 		// be used. It must correspond to what pass in
 		// to texture.Bind() default is 0
-		shader.setUniform1i("u_Texture", 0);
+		shader.SetUniform1i("u_Texture", 0);
 
 		Renderer renderer;
 
+		ImGui::CreateContext();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init();
+
+		ImGui::StyleColorsDark();
+
 		float r = 0.0f;
 		float increment = 0.05f;
+
+		glm::vec3 translation { 0.5f, 0.5f, 0.0f };
 
 		// Loop until the user closes the window
 		while (!glfwWindowShouldClose(window))
@@ -115,10 +134,20 @@ int main(void)
 		
 			renderer.Clear();
 
+			// to be put above any imgui code for this frame
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+			// since in OpenGL matrix are ordered by column
+			// I need to multiply the matrix in reverse 
+			glm::mat4 mvp = projection * view * model;
+
 			// uniform are per draw, for now I need to do this for
 			// settings uniform. One way to solve this would be using
 			// materials
-			//shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
+			shader.SetUniformMat4f("u_MVP", mvp);
 
 			renderer.Draw(va, ib, shader);
 		
@@ -133,6 +162,15 @@ int main(void)
 
 			r += increment;
 
+			{
+				static float f = 0.0f;
+				ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			}
+
+
+			ImGui::Render();
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			// Swap front and back buffers 
 			glfwSwapBuffers(window);
 
@@ -141,6 +179,10 @@ int main(void)
 		}
 
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	glfwTerminate();
 
